@@ -1,5 +1,10 @@
 # Reddit Stock Sentiment Analyzer
 
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NumPy](https://img.shields.io/badge/numpy-pandas-green.svg)](https://numpy.org/)
+[![Matplotlib](https://img.shields.io/badge/matplotlib-visualization-orange.svg)](https://matplotlib.org/)
+
 An AI-powered tool that analyzes stock market sentiment from Reddit discussions using NLP.
 
 ## Quick Start
