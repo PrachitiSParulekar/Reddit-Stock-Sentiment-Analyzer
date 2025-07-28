@@ -1,6 +1,6 @@
 # Reddit Stock Sentiment Analyzer
 
-[![CI/CD Pipeline](https://github.com/YOUR_USERNAME/reddit-stock-sentiment/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/YOUR_USERNAME/reddit-stock-sentiment/actions)
+[![CI/CD Pipeline](https://github.com/PrachitiSParulekar/Reddit-Stock-Sentiment-Analyzer/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/PrachitiSParulekar/Reddit-Stock-Sentiment-Analyzer/actions)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -11,8 +11,8 @@ An AI-powered project that analyzes stock market sentiment from Reddit discussio
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/reddit-stock-sentiment.git
-   cd reddit-stock-sentiment
+   git clone https://github.com/PrachitiSParulekar/Reddit-Stock-Sentiment-Analyzer.git
+   cd Reddit-Stock-Sentiment-Analyzer
    ```
 
 2. **Set up environment**
