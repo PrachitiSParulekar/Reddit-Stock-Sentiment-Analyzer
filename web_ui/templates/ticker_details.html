@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ticker }} - Stock Sentiment Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Ticker Header -->
+    <div class="ticker-header">
+        <h1>${{ ticker }}</h1>
+        <p class="subtitle">Reddit Sentiment Analysis - Last {{ hours }} hours</p>
+    </div>
+
+    <!-- Time Range Selector -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="blue-jay-bg-light" style="display: inline-flex; gap: 0.5rem; border-radius: 8px; padding: 0.25rem;">
+            <a href="{{ url_for('ticker_details', ticker=ticker, hours=6) }}" 
+               class="btn {% if hours == 6 %}btn-primary{% else %}blue-jay-bg-light{% endif %}" 
+               style="padding: 0.5rem 1rem; font-size: 0.9rem; {% if hours != 6 %}color: #2B547E;{% endif %}">6h</a>
+            <a href="{{ url_for('ticker_details', ticker=ticker, hours=24) }}" 
+               class="btn {% if hours == 24 %}btn-primary{% else %}blue-jay-bg-light{% endif %}" 
+               style="padding: 0.5rem 1rem; font-size: 0.9rem; {% if hours != 24 %}color: #2B547E;{% endif %}">24h</a>
+            <a href="{{ url_for('ticker_details', ticker=ticker, hours=72) }}" 
+               class="btn {% if hours == 72 %}btn-primary{% else %}blue-jay-bg-light{% endif %}" 
+               style="padding: 0.5rem 1rem; font-size: 0.9rem; {% if hours != 72 %}color: #2B547E;{% endif %}">3d</a>
+            <a href="{{ url_for('ticker_details', ticker=ticker, hours=168) }}" 
+               class="btn {% if hours == 168 %}btn-primary{% else %}blue-jay-bg-light{% endif %}" 
+               style="padding: 0.5rem 1rem; font-size: 0.9rem; {% if hours != 168 %}color: #2B547E;{% endif %}">7d</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content">
+            {% if sentiment_data and summary.total_mentions > 0 %}
+                <!-- Sentiment Overview Cards -->
+                <div class="sentiment-overview">
+                    <div class="sentiment-card positive">
+                        <h3>{{ positive_pct }}%</h3>
+                        <p>Positive Sentiment</p>
+                        <small>{{ summary.positive_mentions }} mentions</small>
+                    </div>
+                    <div class="sentiment-card negative">
+                        <h3>{{ negative_pct }}%</h3>
+                        <p>Negative Sentiment</p>
+                        <small>{{ summary.negative_mentions }} mentions</small>
+                    </div>
+                    <div class="sentiment-card neutral">
+                        <h3>{{ neutral_pct }}%</h3>
+                        <p>Neutral Sentiment</p>
+                        <small>{{ summary.neutral_mentions }} mentions</small>
+                    </div>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="summary-stats">
+                    <h3 style="margin-bottom: 1rem;">📊 Summary Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="value">{{ summary.total_mentions }}</div>
+                            <div class="label">Total Mentions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value">{{ "%.3f"|format(summary.avg_sentiment) }}</div>
+                            <div class="label">Average Sentiment</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value">{{ "%.3f"|format(summary.avg_sentiment) }}</div>
+                            <div class="label">Latest Sentiment</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value">
+                                {% if summary.avg_sentiment > 0.1 %}
+                                    📈 Bullish
+                                {% elif summary.avg_sentiment < -0.1 %}
+                                    📉 Bearish
+                                {% else %}
+                                    ➡️ Neutral
+                                {% endif %}
+                            </div>
+                            <div class="label">Overall Sentiment</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Trends -->
+                {% if trends %}
+                <div style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">📈 Hourly Trends</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Time Period</th>
+                                    <th>Posts</th>
+                                    <th>Avg Sentiment</th>
+                                    <th>Positive</th>
+                                    <th>Negative</th>
+                                    <th>Neutral</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trend in trends[:24] %}
+                                <tr>
+                                    <td>{{ trend.date_hour }}</td>
+                                    <td>{{ trend.post_count }}</td>
+                                    <td>
+                                        <span class="sentiment-label {% if trend.mean_sentiment > 0.1 %}positive{% elif trend.mean_sentiment < -0.1 %}negative{% else %}neutral{% endif %}">
+                                            {{ "%.3f"|format(trend.mean_sentiment) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-success">{{ trend.positive_count }}</td>
+                                    <td class="text-danger">{{ trend.negative_count }}</td>
+                                    <td class="text-muted">{{ trend.neutral_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Analysis Insights -->
+                <div class="blue-jay-card" style="padding: 1.5rem; margin: 2rem 0;">
+                    <h3 style="margin-bottom: 1rem;">🔍 Analysis Insights</h3>
+                    <ul style="line-height: 1.8; color: #223366;">
+                        <li><strong>Sentiment Score:</strong> 
+                            {% if summary.avg_sentiment > 0.3 %}
+                                Very Positive ({{ "%.3f"|format(summary.avg_sentiment) }}) - Strong bullish sentiment detected
+                            {% elif summary.avg_sentiment > 0.1 %}
+                                Positive ({{ "%.3f"|format(summary.avg_sentiment) }}) - Moderately bullish sentiment
+                            {% elif summary.avg_sentiment < -0.3 %}
+                                Very Negative ({{ "%.3f"|format(summary.avg_sentiment) }}) - Strong bearish sentiment detected
+                            {% elif summary.avg_sentiment < -0.1 %}
+                                Negative ({{ "%.3f"|format(summary.avg_sentiment) }}) - Moderately bearish sentiment
+                            {% else %}
+                                Neutral ({{ "%.3f"|format(summary.avg_sentiment) }}) - No clear directional bias
+                            {% endif %}
+                        </li>
+                        <li><strong>Discussion Volume:</strong> 
+                            {% if summary.total_mentions > 100 %}
+                                High activity ({{ summary.total_mentions }} mentions) - Significant Reddit interest
+                            {% elif summary.total_mentions > 20 %}
+                                Moderate activity ({{ summary.total_mentions }} mentions) - Regular discussion
+                            {% else %}
+                                Low activity ({{ summary.total_mentions }} mentions) - Limited discussion
+                            {% endif %}
+                        </li>
+                        <li><strong>Sentiment Distribution:</strong> 
+                            {{ positive_pct }}% positive, {{ negative_pct }}% negative, {{ neutral_pct }}% neutral
+                        </li>
+                    </ul>
+                </div>
+
+            {% else %}
+                <!-- No Data Available -->
+                <div style="text-align: center; padding: 3rem; background: #f8fafc; border-radius: 8px;">
+                    <h2 style="color: #6b7280; margin-bottom: 1rem;">📭 No Data Available</h2>
+                    <p style="color: #6b7280; margin-bottom: 2rem;">
+                        We don't have recent sentiment data for <strong>${{ ticker }}</strong> in our database.
+                        This could mean:
+                    </p>
+                    <ul style="text-align: left; display: inline-block; color: #6b7280; line-height: 1.8;">
+                        <li>The ticker hasn't been mentioned recently on Reddit</li>
+                        <li>Our data collection is still in progress</li>
+                        <li>The ticker symbol might be incorrect</li>
+                    </ul>
+                    <div style="margin-top: 2rem;">
+                        <a href="{{ url_for('home') }}" class="btn btn-primary">Try Another Ticker</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                <h4 style="margin-bottom: 1rem;">📊 Quick Actions</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <a href="{{ url_for('home') }}" class="btn btn-secondary" style="font-size: 0.9rem;">Search Another Ticker</a>
+                    <button onclick="window.location.reload()" class="btn blue-jay-bg-light" style="color: #2B547E; font-size: 0.9rem;">Refresh Data</button>
+                </div>
+            </div>
+
+            {% if summary and summary.total_mentions > 0 %}
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                <h4 style="margin-bottom: 1rem;">📋 Export Data</h4>
+                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 1rem;">
+                    Raw data available via API endpoint:
+                </p>
+                <code style="font-size: 0.7rem; word-break: break-all; background: #f1f5f9; padding: 0.5rem; border-radius: 4px; display: block;">
+                    /api/sentiment/ticker/{{ ticker }}?hours={{ hours }}
+                </code>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-refresh data every 5 minutes
+setInterval(function() {
+    // Only auto-refresh if there's data to refresh
+    {% if sentiment_data and summary.total_mentions > 0 %}
+    const lastRefresh = localStorage.getItem('lastRefresh');
+    const now = Date.now();
+    if (!lastRefresh || now - lastRefresh > 300000) { // 5 minutes
+        localStorage.setItem('lastRefresh', now);
+        // Could implement a silent refresh here
+    }
+    {% endif %}
+}, 300000);
+</script>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Sentiment - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section with Ticker Search -->
+    <div class="search-form">
+        <h2 style="color: #2B547E; font-size: 2.5rem; margin-bottom: 1rem;">� Stock Sentiment Analyzer</h2>
+        <p style="color: #7788aa; font-size: 1.2rem; margin-bottom: 2rem;">Enter a stock ticker to instantly analyze Reddit sentiment</p>
+        
+        <form method="POST" action="{{ url_for('search_ticker') }}">
+            <div class="search-input">
+                <input type="text" 
+                       name="ticker" 
+                       placeholder="Enter ticker (e.g., TSLA, AAPL, GME)" 
+                       required 
+                       maxlength="10"
+                       pattern="[A-Za-z]+"
+                       title="Please enter a valid stock ticker (letters only)"
+                       style="font-size: 1.1rem; padding: 1rem;">
+                <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Analyze Sentiment</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Features Section -->
+    <div style="max-width: 800px; margin: 3rem auto; text-align: center;">
+        <h3 style="color: #223366; margin-bottom: 2rem; font-size: 1.8rem;">What You'll Get</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin: 2rem 0;">
+            <div class="blue-jay-card" style="padding: 2rem; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                <h4 style="color: #2B547E; margin-bottom: 1rem;">Positive Sentiment</h4>
+                <p style="color: #223366;">See percentage of bullish discussions and positive mentions</p>
+            </div>
+            
+            <div class="blue-jay-card" style="padding: 2rem; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">�</div>
+                <h4 style="color: #2B547E; margin-bottom: 1rem;">Negative Sentiment</h4>
+                <p style="color: #223366;">Track bearish sentiment and critical discussions</p>
+            </div>
+            
+            <div class="blue-jay-card" style="padding: 2rem; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">➡️</div>
+                <h4 style="color: #2B547E; margin-bottom: 1rem;">Neutral Sentiment</h4>
+                <p style="color: #223366;">Monitor objective and factual conversations</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Section -->
+    <div style="background: white; border-radius: 12px; padding: 2rem; margin: 3rem auto; max-width: 600px; text-align: center; box-shadow: 0 4px 12px rgba(43,84,126,0.1);">
+        <h4 style="color: #223366; margin-bottom: 1.5rem;">Try Popular Stocks</h4>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('ticker_details', ticker='TSLA') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">TSLA</a>
+            <a href="{{ url_for('ticker_details', ticker='AAPL') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">AAPL</a>
+            <a href="{{ url_for('ticker_details', ticker='GME') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">GME</a>
+            <a href="{{ url_for('ticker_details', ticker='SPY') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">SPY</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-uppercase ticker input
+document.querySelector('input[name="ticker"]').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+// Handle form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const ticker = document.querySelector('input[name="ticker"]').value.trim();
+    if (!ticker) {
+        e.preventDefault();
+        alert('Please enter a stock ticker');
+        return;
+    }
+    
+    // Show loading state
+    const button = document.querySelector('button[type="submit"]');
+    const originalText = button.textContent;
+    button.textContent = 'Analyzing...';
+    button.disabled = true;
+    
+    // Re-enable after a delay if needed
+    setTimeout(() => {
+        button.textContent = originalText;
+        button.disabled = false;
+    }, 5000);
+});
+</script>
+{% endblock %}

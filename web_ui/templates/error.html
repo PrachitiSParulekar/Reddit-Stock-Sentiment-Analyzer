@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Stock Sentiment Analyzer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="content">
+        <div style="text-align: center; padding: 3rem; background: #f8fafc; border-radius: 12px; margin: 2rem 0;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">❌</div>
+            <h1 style="color: #dc2626; margin-bottom: 1rem;">Oops! Something went wrong</h1>
+            
+            {% if error_message %}
+                <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin: 1.5rem 0; color: #dc2626;">
+                    <strong>Error:</strong> {{ error_message }}
+                </div>
+            {% endif %}
+
+            {% if ticker %}
+                <p style="color: #6b7280; margin-bottom: 2rem;">
+                    We encountered an issue while trying to analyze <strong>${{ ticker }}</strong>.
+                </p>
+            {% else %}
+                <p style="color: #6b7280; margin-bottom: 2rem;">
+                    We encountered an unexpected error. This might be temporary.
+                </p>
+            {% endif %}
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: #374151; margin-bottom: 1rem;">What you can try:</h3>
+                <ul style="text-align: left; display: inline-block; color: #6b7280; line-height: 1.8;">
+                    <li>Check if the stock ticker is spelled correctly</li>
+                    <li>Try a different ticker symbol</li>
+                    <li>Wait a moment and try again</li>
+                    <li>Check if our API service is running</li>
+                    <li>Visit our trending page to see what's working</li>
+                </ul>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('home') }}" class="btn btn-primary">🏠 Back to Home</a>
+                <button onclick="window.history.back()" class="btn" style="background: #f1f5f9; color: #374151;">← Go Back</button>
+                <button onclick="window.location.reload()" class="btn" style="background: #f1f5f9; color: #374151;">🔄 Retry</button>
+            </div>
+        </div>
+
+        <!-- Common Issues -->
+        <div style="background: white; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3 style="color: #2563eb; margin-bottom: 1rem;">💡 Common Issues</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div style="background: #f8fafc; border-radius: 6px; padding: 1rem; border-left: 4px solid #2563eb;">
+                    <h5 style="color: #2563eb; margin-bottom: 0.5rem;">API Connection</h5>
+                    <p style="font-size: 0.9rem; color: #374151;">
+                        Make sure the backend API server is running on port 5001. You can check this by visiting the trending page.
+                    </p>
+                </div>
+                
+                <div style="background: #f8fafc; border-radius: 6px; padding: 1rem; border-left: 4px solid #059669;">
+                    <h5 style="color: #059669; margin-bottom: 0.5rem;">No Data Available</h5>
+                    <p style="font-size: 0.9rem; color: #374151;">
+                        Some tickers may not have recent mentions on Reddit. Try popular stocks like TSLA, AAPL, or GME.
+                    </p>
+                </div>
+                
+                <div style="background: #f8fafc; border-radius: 6px; padding: 1rem; border-left: 4px solid #d97706;">
+                    <h5 style="color: #d97706; margin-bottom: 0.5rem;">Invalid Ticker</h5>
+                    <p style="font-size: 0.9rem; color: #374151;">
+                        Make sure you're using a valid stock ticker symbol (e.g., TSLA, not Tesla).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status Check -->
+        <div style="background: #f1f5f9; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+            <h3 style="color: #374151; margin-bottom: 1rem;">🔧 System Status</h3>
+            <div id="status-check" style="color: #6b7280;">
+                Checking system status...
+            </div>
+            <button onclick="checkStatus()" class="btn btn-secondary" style="margin-top: 1rem; font-size: 0.9rem;">Check Again</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function checkStatus() {
+    const statusDiv = document.getElementById('status-check');
+    statusDiv.innerHTML = 'Checking...';
+    
+    try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        
+        if (data.status === 'online' || data.status === 'healthy') {
+            statusDiv.innerHTML = `
+                <div style="color: #059669;">
+                    ✅ API is running and accessible<br>
+                    <small>Reddit API: ${data.reddit_api_configured ? '✅ Connected' : '❌ Not configured'}</small>
+                </div>
+            `;
+        } else {
+            statusDiv.innerHTML = '<div style="color: #d97706;">⚠️ API is responding but may have issues</div>';
+        }
+    } catch (error) {
+        statusDiv.innerHTML = '<div style="color: #dc2626;">❌ Cannot connect to API server</div>';
+    }
+}
+
+// Check status on page load
+document.addEventListener('DOMContentLoaded', checkStatus);
+
+// Auto-check every 30 seconds
+setInterval(checkStatus, 30000);
+</script>
+{% endblock %}
