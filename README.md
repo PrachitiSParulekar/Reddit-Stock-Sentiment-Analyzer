@@ -2,8 +2,10 @@
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![NumPy](https://img.shields.io/badge/numpy-pandas-green.svg)](https://numpy.org/)
-[![Matplotlib](https://img.shields.io/badge/matplotlib-visualization-orange.svg)](https://matplotlib.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.3.3-green.svg)](https://flask.palletsprojects.com/)
+[![Pandas](https://img.shields.io/badge/Pandas-2.0.3-orange.svg)](https://pandas.pydata.org/)
+[![TextBlob](https://img.shields.io/badge/TextBlob-NLP-red.svg)](https://textblob.readthedocs.io/)
+[![PRAW](https://img.shields.io/badge/PRAW-Reddit_API-ff4500.svg)](https://praw.readthedocs.io/)
 
 An AI-powered tool that analyzes stock market sentiment from Reddit discussions using NLP.
 
